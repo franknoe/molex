@@ -1,0 +1,1557 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language american
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 3cm
+\topmargin 2cm
+\rightmargin 3cm
+\bottommargin 2cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip smallskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Sampling amplitudes and timescales
+\end_layout
+
+\begin_layout Standard
+Consider a simple amplitude scaling move using random number 
+\lang english
+
+\begin_inset Formula $c\sim U(0,1)$
+\end_inset
+
+:
+\lang american
+ 
+\begin_inset Formula 
+\[
+a'=(c+0.5)a=ac+0.5a
+\]
+
+\end_inset
+
+
+\lang english
+The proposal densities are then 
+\begin_inset Formula 
+\begin{eqnarray*}
+p(a\rightarrow a') & = & a\\
+p(a'\rightarrow a) & = & a'
+\end{eqnarray*}
+
+\end_inset
+
+giving rise to the ratio: 
+\begin_inset Formula 
+\[
+\frac{p(a'\rightarrow a)}{p(a\rightarrow a')}=\frac{a'}{a}=c+0.5\,.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+Likewise we can sample with a different random process that keeps the amplitudes
+ closer to 1 (probably better for acceptance).
+\end_layout
+
+\begin_layout Section
+Splitting and merging states
+\end_layout
+
+\begin_layout Standard
+This is probably not needed for the fingerprints because fingerprints are
+ estimated on a timescale grid.
+ Anyway, for future reference....
+\end_layout
+
+\begin_layout Subsection
+
+\lang english
+State splitting probability
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+\begin_inset CommandInset label
+LatexCommand label
+name "sub_number-of-states-sampling"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+Like a direct Markov model 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Prinz2011"
+
+\end_inset
+
+, the estimated HMM will provide a consistent model of the stationary and
+ kinetic properties of the data if the Markov states are sufficiently fine,
+ i.e., if there are sufficiently many states such that the conformational
+ dynamics is appropriately described by a Markov chain.
+ We conducted tests of the model consistency by comparing directly estimated
+ and HMM-generated FRET efficiency histograms on various timescales as described
+ in Sec.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Time-binned FRET efficiency distributions
+\begin_inset Quotes erd
+\end_inset
+
+, and, when this test fails we consider to split states that are most likely
+ to be the course for the failure.
+ This procedure is continued until the HMM test succeeded.
+ To select candidates for splitting, we considered the lifetime distributions
+ described in Sec.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Lifetime distributions
+\begin_inset Quotes erd
+\end_inset
+
+ and identified those states whose lifetimes can clearly not be described
+ by a single exponential.
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+Since the lifetime distributions are computed from a finite number of realizatio
+ns, the decision whether an estimated lifetime distribution is single-exponentia
+l or not, must be based on statistics.
+ Here, we develop a Markov Chain Monte Carlo (MCMC) algorithm that, for
+ each estimated cumulative lifetime distribution 
+\begin_inset Formula $\hat{p}(t)$
+\end_inset
+
+, performs a model selection between a single exponential generating model:
+ 
+\begin_inset Formula 
+\[
+p_{1}(t)=\mathrm{e}^{-tk}
+\]
+
+\end_inset
+
+and a bi-exponential generating model: 
+\begin_inset Formula 
+\[
+p_{2}(t)=a\mathrm{e}^{tk_{1}}+(1-a)\mathrm{e}^{tk_{2}}.
+\]
+
+\end_inset
+
+The probability for either of these models to generate a sample of segment
+ lengths 
+\begin_inset Formula $(t_{1},...,t_{n})$
+\end_inset
+
+ is given by: 
+\begin_inset Formula 
+\[
+\mathbb{P}(\lambda_{x}\mid t_{1},...,t_{n})=\mathbb{P}_{x}(\lambda)\prod_{i}p_{x}(t_{i})\,,
+\]
+
+\end_inset
+
+where we use Jeffrey's prior: 
+\begin_inset Formula 
+\[
+\mathbb{P}_{1}(k)=\frac{1}{k}
+\]
+
+\end_inset
+
+and 
+\begin_inset Formula 
+\[
+\mathbb{P}_{2}(a,k_{1},k_{2})=\frac{1}{ak_{1}+(a-1)k_{2}}
+\]
+
+\end_inset
+
+When correctly defined, this MCMC algorithm will sample from each of the
+ two models according to their respective probabilities to have generated
+ the observed set of exit times.
+ Such an MCMC algorithm requires at least four Monte Carlo steps: (1) a
+ step that can sample new parameters 
+\begin_inset Formula $k$
+\end_inset
+
+ within the single-exponential model, (2) a step that can sample new parameters
+ 
+\begin_inset Formula $a$
+\end_inset
+
+, 
+\begin_inset Formula $k_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $k_{2}$
+\end_inset
+
+ in the bi-exponential model, (3) a step to split a single-exponential model
+ into a bi-exponential model, (4) a step to merge a bi-exponential model
+ into a single-exponential model.
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+In order to implement the split and merge steps, we need to propose a rule
+ by which the single-exponential parameter 
+\begin_inset Formula $k$
+\end_inset
+
+ and the bi-exponential parameters 
+\begin_inset Formula $a$
+\end_inset
+
+, 
+\begin_inset Formula $k_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $k_{2}$
+\end_inset
+
+ are related, and then compute the appropriate MCMC acceptance probabilities
+ from this rule.
+ Consider the following relation: 
+\begin_inset Formula 
+\begin{eqnarray}
+k & = & ak_{1}+(1-a)k_{2}\nonumber \\
+ & = & a(k_{1}-k_{2})+k_{2}\label{eq_MCMC-parameter-relation}
+\end{eqnarray}
+
+\end_inset
+
+and consider further the parametrization 
+\begin_inset Formula 
+\[
+k_{1}=bk
+\]
+
+\end_inset
+
+with 
+\begin_inset Formula $a,b\in[0,1]$
+\end_inset
+
+ and 
+\begin_inset Formula $k_{1}\le k_{2}$
+\end_inset
+
+.
+ We define the splitting move by generating 
+\begin_inset Formula $a,b$
+\end_inset
+
+ as uniform random numbers in 
+\begin_inset Formula $[0,1]$
+\end_inset
+
+.
+ We obtain 
+\begin_inset Formula 
+\[
+k_{2}=\frac{1-ab}{1-a}k
+\]
+
+\end_inset
+
+In order to calculate the proposal probability of the splitting move consider
+ the random number distributions 
+\begin_inset Formula 
+\begin{eqnarray*}
+p(a) & = & 1\:\:\:\: a\text{\ensuremath{\in}[0,1]}\\
+p(b) & = & 1\:\:\:\: b\text{\ensuremath{\in}[0,1]}
+\end{eqnarray*}
+
+\end_inset
+
+we transform the variables 
+\begin_inset Formula $(a,b)$
+\end_inset
+
+ into 
+\begin_inset Formula $(k_{1},k_{2})$
+\end_inset
+
+: 
+\begin_inset Formula 
+\begin{eqnarray*}
+a & = & \frac{k-k_{2}}{k_{1}-k_{2}}\\
+b & = & \frac{k_{1}}{k}
+\end{eqnarray*}
+
+\end_inset
+
+This involves the Jacobian: 
+\begin_inset Formula 
+\begin{eqnarray*}
+\mid J\mid & = & \left|\mathrm{det}\left(\begin{array}{cc}
+\frac{d}{dk_{1}}a & \frac{d}{dk_{2}}a\\
+\frac{d}{dk_{1}}b & \frac{d}{dk_{2}}b
+\end{array}\right)\right|\\
+ & = & \frac{k-k_{1}}{(k_{1}-k_{2})^{2}}\frac{1}{k}
+\end{eqnarray*}
+
+\end_inset
+
+This yields the splitting proposal density 
+\begin_inset Formula 
+\[
+p(k\rightarrow a,k_{1},k_{2})\propto\frac{k-k_{1}}{(k_{1}-k_{2})^{2}}\frac{1}{k}=\frac{1-b}{(k_{1}-k_{2})^{2}}\:\:\: k_{1}\le k
+\]
+
+\end_inset
+
+while the merging proposal density is given by: 
+\begin_inset Formula 
+\[
+p(a,k_{1},k_{2}\rightarrow k)=1
+\]
+
+\end_inset
+
+yielding the splitting acceptance probability:
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+\begin_inset Formula 
+\[
+p_{acc}^{\mathrm{split}}=\frac{\mathbb{P}_{2}(a,k_{1},k_{2}\mid t_{1},...,t_{n})}{\mathbb{P}_{1}(k\mid t_{1},...,t_{n})}\frac{(k_{1}-k_{2})^{2}}{(1-b)}
+\]
+
+\end_inset
+
+and the merging acceptance probability: 
+\begin_inset Formula 
+\[
+p_{acc}^{\mathrm{merge}}=\frac{\mathbb{P}_{1}(k\mid t_{1},...,t_{n})}{\mathbb{P}_{2}(a,k_{1},k_{2}\mid t_{1},...,t_{n})}\frac{(1-b)}{(k_{1}-k_{2})^{2}}
+\]
+
+\end_inset
+
+For the MCMC steps that change the parameters within a given model, we consider
+ the straightforward and the uniform move 
+\begin_inset Formula $a\sim U(0,1)$
+\end_inset
+
+, and the rate scaling move: 
+\begin_inset Formula 
+\[
+k'=(c+0.5)k=kc+0.5k
+\]
+
+\end_inset
+
+with random number 
+\begin_inset Formula $c\sim U(0,1)$
+\end_inset
+
+.
+ The proposal densities are 
+\begin_inset Formula 
+\begin{eqnarray*}
+p(k\rightarrow k') & = & k\\
+p(k'\rightarrow k) & = & k'
+\end{eqnarray*}
+
+\end_inset
+
+giving rise to the ratio: 
+\begin_inset Formula 
+\[
+\frac{p(k'\rightarrow k)}{p(k\rightarrow k')}=\frac{k'}{k}=c+0.5\,.
+\]
+
+\end_inset
+
+This results in the sampling algorithm 5.
+ When Algorithm 5 returns 
+\begin_inset Formula $n>1.5$
+\end_inset
+
+, the corresponding hidden state should be split.
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%	P E R F O R M I N G   S T A T E   S P L I T T I N G
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+\lang english
+Performing a state splitting
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+\begin_inset CommandInset label
+LatexCommand label
+name "sub_splitting"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+Without restriction of generality we consider that the 
+\begin_inset Formula $n$
+\end_inset
+
+'th state will be split, and we generate a new set of state parameters for
+ the childs 
+\begin_inset Formula $(n,n+1)$
+\end_inset
+
+ as described below.
+ The new parameters will serve as an input to an EM algorithm, in which
+ the new full parameter set is optimized to convergence.
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+We find a separation of the 
+\begin_inset Formula $n$
+\end_inset
+
+th exit time distribution in terms of 
+\begin_inset Formula 
+\[
+p(\tau)=a\mathrm{e}^{-k_{n}\tau}+(1-a)\mathrm{e}^{-k_{n+1}\tau}\,.
+\]
+
+\end_inset
+
+Given a transition element 
+\begin_inset Formula $Q_{ii}$
+\end_inset
+
+ we have the relationship 
+\begin_inset Formula 
+\[
+k_{i}=-\ln Q_{i,i}
+\]
+
+\end_inset
+
+suggesting diagonal matrix elements 
+\begin_inset Formula 
+\[
+Q_{i,i}=\mathrm{e}^{-k_{i}}\,.
+\]
+
+\end_inset
+
+We start with matrix 
+\begin_inset Formula $\mathbf{T}$
+\end_inset
+
+ and stationary distribution 
+\begin_inset Formula $\boldsymbol{\pi}$
+\end_inset
+
+, for which the corresponding correlation matrix is defined as 
+\begin_inset Formula 
+\[
+\mathbf{C}=\boldsymbol{\Pi}\mathbf{T}
+\]
+
+\end_inset
+
+with 
+\begin_inset Formula $\boldsymbol{\Pi}=\mathrm{diag}(\boldsymbol{\pi})$
+\end_inset
+
+.
+ Furthermore, let us assume we want to split the last state, 
+\begin_inset Formula $n$
+\end_inset
+
+, such that the new states have diagonal elements given by 
+\begin_inset Formula 
+\begin{eqnarray*}
+Q_{n,n} & = & \mathrm{e}^{-k_{n}}\\
+Q_{n+1,n+1} & = & \mathrm{e}^{-k_{n+1}}\,,
+\end{eqnarray*}
+
+\end_inset
+
+and the relative probabilities are given by 
+\begin_inset Formula 
+\[
+\frac{\pi_{n}}{\pi_{n+1}}=\frac{a}{1-a}
+\]
+
+\end_inset
+
+An new correlation matrix 
+\begin_inset Formula $\mathbf{D}$
+\end_inset
+
+ with a modified state 
+\begin_inset Formula $n$
+\end_inset
+
+ and and additional state 
+\begin_inset Formula $n+1$
+\end_inset
+
+ is obtained from the original matrix 
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+ as 
+\begin_inset Formula 
+\[
+\mathbf{D}=\left(\begin{array}{ccccc}
+C_{11} & \cdots & C_{1,n-1} & D_{1,n} & D_{1,n+1}\\
+\vdots &  & \vdots & \vdots\\
+C_{n-1,1} & \cdots & C_{n-1,n-1} & \vdots & \vdots\\
+D_{n,1} & \cdots & \cdots & D_{n,n}\\
+D_{n+1,1} &  & \cdots &  & D_{n+1,n+1}
+\end{array}\right)
+\]
+
+\end_inset
+
+with the constraints: 
+\end_layout
+
+\begin_layout Enumerate
+
+\lang english
+\begin_inset Formula $Q_{n,n}=\frac{D_{n,n}}{\sum_{i}D_{n,i}}=\mathrm{e}^{-k_{n}}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Enumerate
+
+\lang english
+\begin_inset Formula $Q_{n+1,n+1}=\frac{D_{n+1,n+1}}{\sum_{i}D_{n+1,i}}=\mathrm{e}^{-k_{n+1}}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Enumerate
+
+\lang english
+\begin_inset Formula $\frac{\pi_{n}'}{\pi_{n+1}'}=\frac{\sum_{i}D_{n,i}}{\sum_{i}D_{n+1,i}}=\frac{a}{1-a}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Enumerate
+
+\lang english
+\begin_inset Formula $\pi_{n}'+\pi_{n+1}'=\pi_{n}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Enumerate
+
+\lang english
+\begin_inset Formula $D_{ij}=D_{ji}\:\:\:\:\forall i$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+We intend to fulfill all these contraints, and additionally staying 
+\begin_inset Quotes eld
+\end_inset
+
+close
+\begin_inset Quotes erd
+\end_inset
+
+ to 
+\begin_inset Formula $D_{n,i}+D_{n+1,i}=C_{n,i}\:\:\: i\in\{1,n-1\}$
+\end_inset
+
+.
+ From 3 and 4 we get the row sums: 
+\begin_inset Formula 
+\begin{eqnarray*}
+\pi_{n+1}' & = & \pi_{n}-\pi_{n}'\\
+\pi_{n}' & = & \pi_{n+1}'\frac{a}{1-a}\\
+ & = & (\pi_{n}-\pi_{n}')\frac{a}{1-a}\\
+\pi_{n}' & = & \pi_{n}\frac{\frac{a}{1-a}}{(1+\frac{a}{1-a})}=\pi_{n}a
+\end{eqnarray*}
+
+\end_inset
+
+From the row sums and constraints 1 and 2 we get the diagonals: 
+\begin_inset Formula 
+\begin{eqnarray*}
+D_{n,n} & = & \pi_{n}'\mathrm{e}^{-k_{n}}=d_{1}\\
+D_{n+1,n+1} & = & \pi_{n+1}'\mathrm{e}^{-k_{n+1}}=d_{2}
+\end{eqnarray*}
+
+\end_inset
+
+Next we fill the lower right block.
+ In the ideal case we can maintain counts of the split diagonal elements.
+ 
+\begin_inset Formula 
+\begin{eqnarray*}
+C_{nn} & = & D_{n,n}+2D_{n+1,n}+D_{n+1,n+1}\\
+D_{n+1,n} & = & \frac{C_{nn}-D_{n,n}-D_{n+1,n+1}}{2}
+\end{eqnarray*}
+
+\end_inset
+
+However, if that would results in 
+\begin_inset Formula $D_{n+1,n}<0$
+\end_inset
+
+ or 
+\begin_inset Formula $D_{n+1,n}\ge\min\{\pi_{n}'-D_{n,n},\pi_{n+1}'-D_{n+1,n+1}\}$
+\end_inset
+
+ this solution can't be used, and instead we resort to some number 
+\begin_inset Formula 
+\[
+D_{n+1,n}=\epsilon<\min\{\pi_{n}'-D_{n,n},\pi_{n+1}'-D_{n+1,n+1}\}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%**********************************************************************%
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%	Algorithm 5:  Number of exponentials					%
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%						  							%
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%**********************************************************************%
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float algorithm
+wide true
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\lang english
+Number_of_exponentials(
+\begin_inset Formula $t_{1},...,t_{n}$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+flushleft
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\series bold
+\lang english
+Input
+\series default
+: A set of lifetimes 
+\begin_inset Formula $t_{1},...,t_{n}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\series bold
+\lang english
+Output
+\series default
+: 
+\begin_inset Formula $(n,\, k,a,k_{1},k_{2})$
+\end_inset
+
+ where 
+\begin_inset Formula $n\in[1,2]$
+\end_inset
+
+ is the estimated number of exponentials required to fit the data, 
+\begin_inset Formula $k$
+\end_inset
+
+ is the rate parameter of the single-exponential model, and 
+\begin_inset Formula $a$
+\end_inset
+
+, 
+\begin_inset Formula $k_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $k_{2}$
+\end_inset
+
+ are the parameters of the bi-exponential model.
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[8pt]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+1.
+ 
+\begin_inset Formula $n_{exp}=1$
+\end_inset
+
+, 
+\begin_inset Formula $n_{1}=0$
+\end_inset
+
+, 
+\begin_inset Formula $k_{1,sum}=0$
+\end_inset
+
+, 
+\begin_inset Formula $a_{sum}=0$
+\end_inset
+
+, 
+\begin_inset Formula $k_{21,sum}=0$
+\end_inset
+
+, 
+\begin_inset Formula $k_{22,sum}=0$
+\end_inset
+
+ 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+2.
+ For 
+\begin_inset Formula $i=1,...,N_{sample}$
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+2.1.
+ 
+\begin_inset Formula $r_{1}\sim U(0,1)$
+\end_inset
+
+ 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+2.2.
+ If 
+\begin_inset Formula $n_{exp}=1$
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset space \hspace{}
+\length 0.5cm
+\end_inset
+
+If 
+\begin_inset Formula $r_{1}<0.5$
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset space \hspace{}
+\length 1cm
+\end_inset
+
+Propose rate change 
+\begin_inset Formula $k\rightarrow k'=(r_{2}+0.5)k$
+\end_inset
+
+ with 
+\begin_inset Formula $r_{2}\sim U(0,1)$
+\end_inset
+
+.
+ Accept with
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Formula 
+\[
+p_{acc}^{k}=(r_{2}+0.5)\frac{\mathbb{P}_{1}(k'\mid t_{1},...,t_{n})}{\mathbb{P}_{1}(k\mid t_{1},...,t_{n})}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset space \hspace{}
+\length 0.5cm
+\end_inset
+
+If 
+\begin_inset Formula $r_{1}\ge0.5$
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset space \hspace{}
+\length 1cm
+\end_inset
+
+
+\begin_inset Formula $a\sim U(0,1)$
+\end_inset
+
+, 
+\begin_inset Formula $b\sim U(0,1)$
+\end_inset
+
+.
+ Propose split 
+\begin_inset Formula $k\rightarrow\left(a,\: k_{1}=bk,\: k_{2}=\frac{1-ab}{1-a}k\right)$
+\end_inset
+
+.
+ Accept with: 
+\begin_inset Formula 
+\[
+p_{acc}^{\mathrm{split}}=\frac{\mathbb{P}_{2}(a,k_{1},k_{2}\mid t_{1},...,t_{n})}{\mathbb{P}_{1}(k\mid t_{1},...,t_{n})}\frac{(k_{1}-k_{2})^{2}}{(1-b)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+Else if 
+\begin_inset Formula $n_{exp}=2$
+\end_inset
+
+ 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset space \hspace{}
+\length 0.5cm
+\end_inset
+
+If 
+\begin_inset Formula $r_{1}<0.5$
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset space \hspace{}
+\length 1cm
+\end_inset
+
+
+\begin_inset Formula $r_{3}\sim U(0,1)$
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset space \hspace{}
+\length 1cm
+\end_inset
+
+If 
+\begin_inset Formula $r_{3}<\frac{1}{3}$
+\end_inset
+
+: Propose new amplitude 
+\begin_inset Formula $a'\sim U(0,1)$
+\end_inset
+
+.
+ Accept with
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Formula 
+\[
+p_{acc}=\frac{\mathbb{P}_{2}(a',k_{1},k_{2}\mid t_{1},...,t_{n})}{\mathbb{P}_{2}(a,k_{1},k_{2}\mid t_{1},...,t_{n})}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset space \hspace{}
+\length 1cm
+\end_inset
+
+Else: propose rate change 
+\begin_inset Formula $k_{1/2}\rightarrow k_{1,2}'=(r_{2}+0.5)k_{1/2}$
+\end_inset
+
+ with 
+\begin_inset Formula $r_{2}\sim U(0,1)$
+\end_inset
+
+.
+ Accept with
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Formula 
+\[
+p_{acc}^{k}=(r_{2}+0.5)\frac{\mathbb{P}_{1}(k_{1,2}'\mid t_{1},...,t_{n})}{\mathbb{P}_{1}(k_{1,2}\mid t_{1},...,t_{n})}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset space \hspace{}
+\length 0.5cm
+\end_inset
+
+If 
+\begin_inset Formula $r_{1}\ge0.5$
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset space \hspace{}
+\length 1cm
+\end_inset
+
+Propose merge 
+\begin_inset Formula $\left(a,k_{1},k_{2}\rightarrow k=ak_{1}+(1-a)k_{2}\right)$
+\end_inset
+
+.
+ Accept with:
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Formula 
+\[
+p_{acc}^{\mathrm{merge}}=\frac{\mathbb{P}_{1}(k\mid t_{1},...,t_{n})}{\mathbb{P}_{2}(a,k_{1},k_{2}\mid t_{1},...,t_{n})}\frac{(1-b)}{(k_{1}-k_{2})^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\lang english
+3.
+ Return:
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2pt]
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset space \hspace{}
+\length 3cm
+\end_inset
+
+ 
+\begin_inset Formula $n=1+n_{1}/N_{sample}$
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ 
+\begin_inset space \hspace{}
+\length 3cm
+\end_inset
+
+ 
+\begin_inset Formula $k=k_{1,sum}/N_{sample}$
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ 
+\begin_inset space \hspace{}
+\length 3.01cm
+\end_inset
+
+ 
+\begin_inset Formula $a=a_{1,sum}/N_{sample}$
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ 
+\begin_inset space \hspace{}
+\length 2.87cm
+\end_inset
+
+ 
+\begin_inset Formula $k_{1}=k_{21,sum}/N_{sample}$
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ 
+\begin_inset space \hspace{}
+\length 2.87cm
+\end_inset
+
+ 
+\begin_inset Formula $k_{2}=k_{22,sum}/N_{sample}$
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%*****************************************************************
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\lang english
+We now have remaining counts to be distributed: 
+\begin_inset Formula 
+\begin{eqnarray*}
+r_{n} & = & \pi_{n}'-D_{n,n}-D_{n+1,n}\\
+r_{n+1} & = & \pi_{n+1}'-D_{n+1,n+1}-D_{n+1,n}
+\end{eqnarray*}
+
+\end_inset
+
+and set the remaining elements as: 
+\begin_inset Formula 
+\begin{eqnarray*}
+D_{n,i} & = & r_{n}\frac{C_{n,i}}{\pi_{n}}\\
+D_{n+1,i} & = & r_{n+1}\frac{C_{n,i}}{\pi_{n}}
+\end{eqnarray*}
+
+\end_inset
+
+Finally, we normalize 
+\begin_inset Formula $\mathbf{D}$
+\end_inset
+
+ row-wise to get a transition matrix.
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+The new state parameters are used as an input for an EM algorithm, in which
+ the HMM parameters are again optimized to convergence.
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%	L U M P I N G   O F  R A P I D L Y - I N T E R C O N V E R T I N G   S
+ T A T E S
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
